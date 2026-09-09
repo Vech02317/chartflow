@@ -1,0 +1,2 @@
+graphviz>=0.20
+jsonschema>=4.18

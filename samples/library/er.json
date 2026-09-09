@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "source": "samples/library/models.py",
+  "title": "图书借阅管理系统——实体关系图",
+  "entities": [
+    {
+      "name": "Category",
+      "label": "图书分类",
+      "table": "library_category",
+      "fields": [
+        { "name": "id", "label": "分类编号", "pk": true },
+        { "name": "name", "label": "分类名", "type": "CharField(50)" }
+      ]
+    },
+    {
+      "name": "Book",
+      "label": "图书",
+      "table": "library_book",
+      "fields": [
+        { "name": "id", "label": "图书编号", "pk": true },
+        { "name": "title", "label": "书名", "type": "CharField(200)" },
+        { "name": "author", "label": "作者", "type": "CharField(100)" },
+        { "name": "isbn", "label": "ISBN", "type": "CharField(20)" },
+        { "name": "total", "label": "馆藏总量", "type": "PositiveInteger" }
+      ]
+    },
+    {
+      "name": "Reader",
+      "label": "读者",
+      "table": "library_reader",
+      "fields": [
+        { "name": "id", "label": "读者编号", "pk": true },
+        { "name": "card_no", "label": "借书证号", "type": "CharField(30)" },
+        { "name": "name", "label": "姓名", "type": "CharField(50)" },
+        { "name": "phone", "label": "联系电话", "type": "CharField(20)" }
+      ]
+    },
+    {
+      "name": "BorrowRecord",
+      "label": "借阅记录",
+      "table": "library_borrowrecord",
+      "fields": [
+        { "name": "id", "label": "记录编号", "pk": true },
+        { "name": "borrow_date", "label": "借出日期", "type": "DateField" },
+        { "name": "due_date", "label": "应还日期", "type": "DateField" },
+        { "name": "returned", "label": "是否归还", "type": "BooleanField" }
+      ]
+    }
+  ],
+  "relations": [
+    { "from": "Category", "to": "Book", "cardinality": "1:N", "label": "拥有", "fk_field": "category_id" },
+    { "from": "Book", "to": "BorrowRecord", "cardinality": "1:N", "label": "被借出为", "fk_field": "book_id" },
+    { "from": "Reader", "to": "BorrowRecord", "cardinality": "1:N", "label": "发起", "fk_field": "reader_id" }
+  ]
+}

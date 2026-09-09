@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "er.schema.json",
+  "title": "ER 图数据契约 v1",
+  "description": "LLM(或人工)从 Django models/建表语句抽取出的实体关系,渲染器与验收器唯一输入。字段约定:entity.fields 只放非外键列;外键以 relation.fk_field 表示;relation 的 from 是“一”侧、to 是“多”侧,cardinality 写作 1:N。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "source", "title", "entities", "relations"],
+  "properties": {
+    "version": { "const": 1 },
+    "source": { "type": "string", "description": "抽取来源文件(如 samples/library/models.py)" },
+    "title": { "type": "string" },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "fields"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+          "label": { "type": "string" },
+          "table": { "type": "string" },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "label"],
+              "properties": {
+                "name": { "type": "string" },
+                "label": { "type": "string" },
+                "pk": { "type": "boolean", "default": false },
+                "type": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "cardinality"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "cardinality": { "enum": ["1:N", "N:1", "1:1", "N:M"] },
+          "label": { "type": "string" },
+          "fk_field": { "type": "string" }
+        }
+      }
+    }
+  }
+}
