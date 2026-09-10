@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """流程图渲染器:flow.json → out/<id>.svg + <id>.png
 
-节点形状按 GB/T 流程图惯例:起止=圆角框、处理=矩形、判断=菱形、
-输入输出=平行四边形、子流程=双边框。
+形状严格按 GB/T 1526—1989(等同采用 ISO 5807:1985):
+  起止 = 端点符(圆角)   处理 = 矩形(不带圆角!)   判断 = 菱形
+  输入输出 = 平行四边形   子流程 = 双线矩形(既定处理)
 """
 import json
 import pathlib
@@ -10,15 +11,19 @@ import pathlib
 from engine import _common as C
 
 NODE_STYLE = {
+    # 端点符:圆角(长文本也不会像椭圆那样被撑爆)
     "start": dict(shape="box", style="rounded,filled",
-                  fillcolor=C.ACCENT, fontcolor="white"),
+                  fillcolor=C.ACCENT, fontcolor="white", penwidth="2"),
     "end": dict(shape="box", style="rounded,filled",
-                fillcolor="#3b4a45", fontcolor="white"),
-    "process": dict(shape="box", style="rounded,filled", fillcolor="white"),
-    "decision": dict(shape="diamond", style="filled", fillcolor="#fdf1dc"),
-    "io": dict(shape="parallelogram", style="filled", fillcolor="#eef6f2"),
+                fillcolor="#3b4a45", fontcolor="white", penwidth="2"),
+    # 处理:国标是**矩形**,不可圆角 —— 圆角是端点符的专属形状
+    "process": dict(shape="box", style="filled", fillcolor="white", penwidth="2"),
+    "decision": dict(shape="diamond", style="filled", fillcolor="#fdf1dc",
+                     penwidth="2"),
+    "io": dict(shape="parallelogram", style="filled", fillcolor="#eef6f2",
+               penwidth="2"),
     "subprocess": dict(shape="box", style="filled", peripheries="2",
-                       fillcolor="white"),
+                       fillcolor="white", penwidth="2"),
 }
 
 
@@ -29,8 +34,7 @@ def render(data_path, fig_id, out_dir) -> dict:
         rankdir=data.get("direction", "TB"),
         node_attr={"shape": "box", "fontname": C.FONT, "fontsize": "14"},
         edge_attr={"fontname": C.FONT, "fontsize": "12", "color": "#4a4a4a",
-                   "fontcolor": "#333333", "arrowhead": "vee",
-                   "arrowsize": "0.8"},
+                   "fontcolor": "#333333", "arrowhead": "vee", "arrowsize": "0.8"},
     )
     for n in data["nodes"]:
         g.node(n["id"], label=n["label"],

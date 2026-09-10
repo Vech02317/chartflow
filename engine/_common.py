@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """渲染器共用件:字体、HTML 转义、图属性、产物落盘与 meta 记账。
 
+一份数据可出多种版式(见 emit_many):例如 ER 的「详细版 / 紧凑版」。
 meta 里记了数据文件的 sha256 —— 数据改了却没重跑,check_figs 会据此拦住。
 """
 import hashlib
@@ -18,6 +19,12 @@ COUNT_FIELDS = {
     "er": ["entities", "relations"],
     "class": ["classes", "relations"],
     "flow": ["nodes", "edges"],
+}
+
+# 版式说明:渲染器可产出多个 suffix,人类据此挑选(如 ER 紧凑版插论文)
+VARIANT_DOC = {
+    "full": "详细版 —— 含全部字段,供作者自查",
+    "compact": "紧凑版 —— 只画实体名与关系,供插入论文",
 }
 
 
@@ -43,13 +50,22 @@ def base_graph(title, rankdir="TB", node_attr=None, edge_attr=None):
     )
 
 
-def emit(g, fig_id, type_, data_path, data, out_dir) -> dict:
-    """渲染 SVG+PNG,并写 <id>.meta.json 供验收比对。"""
+def emit_many(graphs, fig_id, type_, data_path, data, out_dir) -> dict:
+    """渲染多种版式并写一份 meta。
+
+    graphs: [(suffix, graphviz_graph), ...];suffix 为空表示主版式。
+    例:ER 传 [("", 详细图), ("_compact", 紧凑图)] → fig1.png + fig1_compact.png
+    """
     out = pathlib.Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    for fmt in ("svg", "png"):
-        g.format = fmt
-        g.render(filename=fig_id, directory=str(out), cleanup=False)
+    outputs = []
+    for suffix, g in graphs:
+        stem = f"{fig_id}{suffix}"
+        for fmt in ("svg", "png"):
+            g.format = fmt
+            g.render(filename=stem, directory=str(out), cleanup=False)
+        outputs.append({"variant": (suffix or "full").lstrip("_"),
+                        "svg": f"{stem}.svg", "png": f"{stem}.png"})
 
     meta = {
         "fig_id": fig_id,
@@ -59,8 +75,13 @@ def emit(g, fig_id, type_, data_path, data, out_dir) -> dict:
         "counts": {k: len(data.get(k, [])) for k in COUNT_FIELDS[type_]},
         "data_sha256": hashlib.sha256(
             pathlib.Path(data_path).read_bytes()).hexdigest(),
-        "outputs": {"svg": f"{fig_id}.svg", "png": f"{fig_id}.png"},
+        "outputs": outputs,
     }
     (out / f"{fig_id}.meta.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     return meta
+
+
+def emit(g, fig_id, type_, data_path, data, out_dir) -> dict:
+    """单一版式渲染(类图 / 流程图用)。"""
+    return emit_many([("", g)], fig_id, type_, data_path, data, out_dir)

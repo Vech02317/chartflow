@@ -45,9 +45,11 @@ def main(plan_path) -> bool:
 
         module = importlib.import_module(f"engine.{RENDERERS[ftype]}")
         module.render(fig_json, fid, out_dir)
-        ok = check_figs.check(fid, ftype, fig_json, out_dir, quiet=True)
+        ok, warns = check_figs.check(fid, ftype, fig_json, out_dir, quiet=True)
         print(f"[{fid}] {ftype} —— {'PASS' if ok else 'FAIL'}"
               f"{'' if ok else f' (详见 out/{fid}.check.txt)'}")
+        for w in warns:
+            print(f"        {w}")
         results.append(ok)
 
     passed = all(results) if results else False
