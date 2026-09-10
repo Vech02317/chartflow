@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "flow.schema.json",
+  "title": "流程图数据契约 v1",
+  "description": "从论文正文的业务描述段落抽取。node.type ∈ start/end/process/decision/io/subprocess;decision 节点的每条出边必须带 label(是/否或条件)。全图须单入口单出口。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "source", "title", "nodes", "edges"],
+  "properties": {
+    "version": { "const": 1 },
+    "source": { "type": "string" },
+    "title": { "type": "string" },
+    "direction": { "enum": ["TB", "LR"], "default": "TB" },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_]+$" },
+          "label": { "type": "string" },
+          "type": { "enum": ["start", "end", "process", "decision", "io", "subprocess"], "default": "process" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    }
+  }
+}

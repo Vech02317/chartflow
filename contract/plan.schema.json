@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plan.schema.json",
+  "title": "出图清单契约 v1",
+  "description": "agent 通读论文后的第一产出:全篇该出哪些图。经人类确认后才执行。source 必须具体到文件或章节,禁止写“全文”。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "paper", "figures"],
+  "properties": {
+    "version": { "const": 1 },
+    "paper": { "type": "string", "description": "论文文件路径或标题" },
+    "figures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "title", "source"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^fig[0-9]+$" },
+          "type": { "enum": ["er", "class", "flow"] },
+          "title": { "type": "string", "description": "将印在图上的图题" },
+          "chapter": { "type": "string", "description": "所在章节" },
+          "source": { "type": "string", "description": "抽取依据:文件路径,或“第X章第X节 + 关键词”" },
+          "status": { "enum": ["todo", "done", "skip"], "default": "todo" },
+          "note": { "type": "string", "description": "skip 时必须写明原因" }
+        }
+      }
+    }
+  }
+}

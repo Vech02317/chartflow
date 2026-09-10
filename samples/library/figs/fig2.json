@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "source": "samples/library/classes.py",
+  "title": "系统核心类图",
+  "classes": [
+    {
+      "name": "Person",
+      "label": "人员",
+      "stereotype": "abstract",
+      "attributes": ["name", "phone"],
+      "methods": ["contact()"]
+    },
+    {
+      "name": "Reader",
+      "label": "读者",
+      "attributes": ["card_no", "credit"],
+      "methods": ["borrow(item)", "give_back(loan)"]
+    },
+    {
+      "name": "Librarian",
+      "label": "图书管理员",
+      "attributes": ["employee_no"],
+      "methods": ["register_item(item)", "handle_overdue(loan)"]
+    },
+    {
+      "name": "Item",
+      "label": "馆藏项",
+      "stereotype": "abstract",
+      "attributes": ["title", "isbn", "total"],
+      "methods": ["available_count()"]
+    },
+    {
+      "name": "Book",
+      "label": "图书",
+      "attributes": ["author", "publisher"],
+      "methods": []
+    },
+    {
+      "name": "Magazine",
+      "label": "期刊",
+      "attributes": ["issue"],
+      "methods": []
+    },
+    {
+      "name": "Loan",
+      "label": "借阅单",
+      "attributes": ["borrow_date", "due_date", "returned"],
+      "methods": ["overdue_days()"]
+    },
+    {
+      "name": "FineCalculator",
+      "label": "罚金计算器",
+      "attributes": ["rate"],
+      "methods": ["compute(loan)"]
+    },
+    {
+      "name": "Library",
+      "label": "图书馆",
+      "attributes": ["name"],
+      "methods": ["add_item(item)", "lend(reader, item)", "settle(loan)"]
+    }
+  ],
+  "relations": [
+    { "from": "Reader", "to": "Person", "kind": "继承" },
+    { "from": "Librarian", "to": "Person", "kind": "继承" },
+    { "from": "Book", "to": "Item", "kind": "继承" },
+    { "from": "Magazine", "to": "Item", "kind": "继承" },
+    { "from": "Library", "to": "Item", "kind": "聚合", "label": "馆藏", "cardinality": "1:N" },
+    { "from": "Library", "to": "Loan", "kind": "组合", "label": "登记", "cardinality": "1:N" },
+    { "from": "Loan", "to": "Reader", "kind": "关联", "cardinality": "N:1" },
+    { "from": "Loan", "to": "Item", "kind": "关联", "cardinality": "N:1" },
+    { "from": "Library", "to": "FineCalculator", "kind": "依赖" }
+  ]
+}

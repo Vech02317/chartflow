@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "source": "samples/library/borrow_flow.md",
+  "title": "借书业务流程图",
+  "direction": "TB",
+  "nodes": [
+    { "id": "start", "label": "开始", "type": "start" },
+    { "id": "input", "label": "输入借书证号与 ISBN", "type": "io" },
+    { "id": "check_card", "label": "借书证有效?", "type": "decision" },
+    { "id": "card_bad", "label": "提示证件无效", "type": "process" },
+    { "id": "check_stock", "label": "库存大于 0?", "type": "decision" },
+    { "id": "no_stock", "label": "提示暂无可借", "type": "process" },
+    { "id": "make_loan", "label": "生成借阅记录", "type": "process" },
+    { "id": "dec_stock", "label": "库存减一", "type": "process" },
+    { "id": "output", "label": "输出借阅成功与应还日期", "type": "io" },
+    { "id": "end", "label": "结束", "type": "end" }
+  ],
+  "edges": [
+    { "from": "start", "to": "input" },
+    { "from": "input", "to": "check_card" },
+    { "from": "check_card", "to": "card_bad", "label": "否" },
+    { "from": "card_bad", "to": "input" },
+    { "from": "check_card", "to": "check_stock", "label": "是" },
+    { "from": "check_stock", "to": "no_stock", "label": "否" },
+    { "from": "no_stock", "to": "end" },
+    { "from": "check_stock", "to": "make_loan", "label": "是" },
+    { "from": "make_loan", "to": "dec_stock" },
+    { "from": "dec_stock", "to": "output" },
+    { "from": "output", "to": "end" }
+  ]
+}

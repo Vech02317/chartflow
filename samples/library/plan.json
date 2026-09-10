@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "paper": "图书借阅管理系统(合成样例)",
+  "figures": [
+    {
+      "id": "fig1",
+      "type": "er",
+      "title": "图书借阅管理系统——实体关系图",
+      "chapter": "第4章 数据库设计",
+      "source": "samples/library/models.py",
+      "status": "todo"
+    },
+    {
+      "id": "fig2",
+      "type": "class",
+      "title": "系统核心类图",
+      "chapter": "第5章 详细设计",
+      "source": "samples/library/classes.py",
+      "status": "todo"
+    },
+    {
+      "id": "fig3",
+      "type": "flow",
+      "title": "借书业务流程图",
+      "chapter": "第5章 详细设计",
+      "source": "samples/library/borrow_flow.md",
+      "status": "todo"
+    },
+    {
+      "id": "fig4",
+      "type": "flow",
+      "title": "还书业务流程图",
+      "chapter": "第5章 详细设计",
+      "source": "samples/library/borrow_flow.md",
+      "status": "skip",
+      "note": "演示用:还书流程待正文补全后再产出,本轮先跳过"
+    }
+  ]
+}

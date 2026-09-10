@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "class.schema.json",
+  "title": "类图数据契约 v1",
+  "description": "从项目源码(类/接口定义)抽取的类与类间关系。attributes/methods 只写名称与签名字符串,不解析类型细节。relation.kind ∈ 继承/组合/聚合/关联/依赖。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "source", "title", "classes", "relations"],
+  "properties": {
+    "version": { "const": 1 },
+    "source": { "type": "string" },
+    "title": { "type": "string" },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+          "label": { "type": "string" },
+          "stereotype": { "enum": ["class", "abstract", "interface", "enum"], "default": "class" },
+          "attributes": { "type": "array", "items": { "type": "string" } },
+          "methods": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "kind"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "kind": { "enum": ["继承", "组合", "聚合", "关联", "依赖"] },
+          "label": { "type": "string" },
+          "cardinality": { "enum": ["1:N", "N:1", "1:1", "N:M"] }
+        }
+      }
+    }
+  }
+}
