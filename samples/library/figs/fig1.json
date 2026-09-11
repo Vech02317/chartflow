@@ -32,7 +32,8 @@
         { "name": "id", "label": "读者编号", "pk": true },
         { "name": "card_no", "label": "借书证号", "type": "CharField(30)" },
         { "name": "name", "label": "姓名", "type": "CharField(50)" },
-        { "name": "phone", "label": "联系电话", "type": "CharField(20)" }
+        { "name": "phone", "label": "联系电话", "type": "CharField(200)" },
+        { "name": "birth_date", "label": "出生日期", "type": "DateField" }
       ]
     },
     {

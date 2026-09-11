@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "source": "samples/library/models.py",
+  "title": "读者实体属性图",
+  "entity": { "name": "Reader", "label": "读者", "table": "library_reader" },
+  "attributes": [
+    { "label": "读者编号", "name": "id", "kind": "pk" },
+    { "label": "借书证号", "name": "card_no" },
+    { "label": "姓名", "name": "name" },
+    { "label": "联系电话", "name": "phone", "kind": "multi" },
+    { "label": "年龄", "name": "age", "kind": "derived" }
+  ]
+}

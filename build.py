@@ -14,7 +14,8 @@ sys.path.insert(0, str(ROOT))
 
 from engine import check_figs  # noqa: E402
 
-RENDERERS = {"er": "render_er", "class": "render_class", "flow": "render_flow"}
+RENDERERS = {"er": "render_er", "class": "render_class", "flow": "render_flow",
+             "attr": "render_attr"}
 
 
 def main(plan_path) -> bool:

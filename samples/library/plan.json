@@ -28,6 +28,14 @@
     },
     {
       "id": "fig4",
+      "type": "attr",
+      "title": "读者实体属性图",
+      "chapter": "第4章 数据库设计",
+      "source": "samples/library/models.py",
+      "status": "todo"
+    },
+    {
+      "id": "fig5",
       "type": "flow",
       "title": "还书业务流程图",
       "chapter": "第5章 详细设计",

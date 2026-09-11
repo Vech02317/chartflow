@@ -18,7 +18,7 @@
         "required": ["id", "type", "title", "source"],
         "properties": {
           "id": { "type": "string", "pattern": "^fig[0-9]+$" },
-          "type": { "enum": ["er", "class", "flow"] },
+          "type": { "enum": ["er", "class", "flow", "attr"] },
           "title": { "type": "string", "description": "将印在图上的图题" },
           "chapter": { "type": "string", "description": "所在章节" },
           "source": { "type": "string", "description": "抽取依据:文件路径,或“第X章第X节 + 关键词”" },

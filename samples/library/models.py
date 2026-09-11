@@ -41,7 +41,9 @@ class Reader(models.Model):
     """读者"""
     card_no = models.CharField("借书证号", max_length=30, unique=True)
     name = models.CharField("姓名", max_length=50)
-    phone = models.CharField("联系电话", max_length=20, blank=True)
+    # 概念上是多值属性:一个读者可登记多个号码,以逗号分隔(实现时宜拆表)
+    phone = models.CharField("联系电话", max_length=200, blank=True)
+    birth_date = models.DateField("出生日期", null=True, blank=True)
 
     class Meta:
         verbose_name = "读者"

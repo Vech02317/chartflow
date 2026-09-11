@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "attr.schema.json",
+  "title": "实体属性图数据契约 v1",
+  "description": "陈氏(Chen)记法的单实体属性图:中央矩形实体 + 周围椭圆属性。约定:一张图只画一个实体(与论文惯例一致,几个实体就出几张图);kind 取 pk=主键(属性名下加下划线)、multi=多值属性(双椭圆)、derived=派生属性(虚线椭圆)、normal=普通属性,默认 normal。attributes 里必须有且只有一个 pk。name 只用于追溯字段出处,不画在图上 —— 陈氏属性图只标中文属性名。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "source", "title", "entity", "attributes"],
+  "properties": {
+    "version": { "const": 1 },
+    "source": { "type": "string", "description": "抽取来源文件(如 samples/library/models.py)" },
+    "title": { "type": "string", "description": "图题,建议短:如“用户实体属性图”" },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+        "label": { "type": "string", "description": "画在矩形里的中文实体名" },
+        "table": { "type": "string" }
+      }
+    },
+    "attributes": {
+      "type": "array",
+      "minItems": 1,
+      "contains": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": { "kind": { "const": "pk" } }
+      },
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label"],
+        "properties": {
+          "label": { "type": "string", "description": "画在椭圆里的中文属性名" },
+          "name": { "type": "string", "description": "对应字段名,仅供追溯" },
+          "kind": { "enum": ["normal", "pk", "multi", "derived"], "default": "normal" }
+        }
+      }
+    }
+  }
+}
