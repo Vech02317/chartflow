@@ -17,6 +17,40 @@ from engine import check_figs  # noqa: E402
 RENDERERS = {"er": "render_er", "class": "render_class", "flow": "render_flow",
              "attr": "render_attr"}
 
+PENDING_HEADER = """# 待确认清单
+
+**这是给人看的** —— 抽取时 agent 拿不准、需要你对着源码 / 建表语句拍板的地方。
+
+`build.py` 的 PASS 只证明「图与契约一致」,**不证明「契约与事实一致」** —— 数据抽得对不对,
+只能由你看着这份清单核对。本文件由 `build.py` 从各图的 `figs/<id>.待确认.md` 机械汇总,
+**不要手改**;要改就改源头那几份,然后重跑 `build.py`。
+"""
+
+
+def _write_pending(plan, figs_dir, out_dir):
+    """把各图的 `figs/<id>.待确认.md` 汇总成 `out/待确认.md`。
+
+    「待确认」是这工具唯一的人机接口 —— 它要是只活在 agent 的对话里,会话一结束就没了,
+    「人拍板」这一步就断了。所以要求 agent 落到文件;这里只做机械汇总,不做判断。
+
+    返回 (汇总文件路径, 未提交记录的图 id 列表)。已 skip 的图不算。
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    missing, parts = [], []
+    for fig in plan["figures"]:
+        if fig.get("status") == "skip":
+            continue
+        fid = fig["id"]
+        src = figs_dir / f"{fid}.待确认.md"
+        body = src.read_text(encoding="utf-8").strip() if src.exists() else ""
+        if not body:
+            missing.append(fid)
+            body = "（该图未提交待确认记录 —— 请确认它是不是真的没有要人拍板的地方）"
+        parts.append(f"## {fid} {fig.get('title', '')}\n\n{body}\n")
+    dst = out_dir / "待确认.md"
+    dst.write_text(PENDING_HEADER + "\n" + "\n".join(parts), encoding="utf-8")
+    return dst, missing
+
 
 def main(plan_path) -> bool:
     from jsonschema import ValidationError, validate
@@ -59,6 +93,11 @@ def main(plan_path) -> bool:
         for w in warns:
             print(f"        {w}")
         results.append(ok)
+
+    dst, missing = _write_pending(plan, figs_dir, out_dir)
+    tail = (f"({len(missing)} 张未提交记录:{'、'.join(missing)})" if missing
+            else "(全部图都已记录)")
+    print(f"[待确认] {dst.relative_to(base)} {tail}")
 
     passed = all(results) if results else False
     print(f"\n{sum(results)}/{len(results)} 通过 —— RESULT: "
