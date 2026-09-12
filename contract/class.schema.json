@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "class.schema.json",
   "title": "类图数据契约 v1",
-  "description": "从项目源码(类/接口定义)抽取的类与类间关系。attributes/methods 只写名称与签名字符串,不解析类型细节。relation.kind ∈ 继承/组合/聚合/关联/依赖。",
+  "description": "从项目源码(类/接口定义)抽取的类与类间关系。attributes/methods 只写名称与签名字符串,不解析类型细节。成员串可带 UML 可见性记号(见下),relation.kind ∈ 继承/组合/聚合/关联/依赖。",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "source", "title", "classes", "relations"],
@@ -21,8 +21,8 @@
           "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
           "label": { "type": "string" },
           "stereotype": { "enum": ["class", "abstract", "interface", "enum"], "default": "class" },
-          "attributes": { "type": "array", "items": { "type": "string" } },
-          "methods": { "type": "array", "items": { "type": "string" } }
+          "attributes": { "type": "array", "items": { "$ref": "#/$defs/member" } },
+          "methods": { "type": "array", "items": { "$ref": "#/$defs/member" } }
         }
       }
     },
@@ -40,6 +40,13 @@
           "cardinality": { "enum": ["1:N", "N:1", "1:1", "N:M"] }
         }
       }
+    }
+  },
+  "$defs": {
+    "member": {
+      "type": "string",
+      "description": "成员串。可带 UML 2.5 可见性记号:'+ ' 公开 / '- ' 私有 / '# ' 保护 / '~ ' 包内 —— 记号与名称之间必须有**一个空格**。无记号则按无可见性处理(如 Python)。",
+      "pattern": "^(?:[+#~-] )?[^+#~\\-\\s]"
     }
   }
 }

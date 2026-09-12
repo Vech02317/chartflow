@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "paper": "订单模块(Java / Spring Boot 样例)",
+  "figures": [
+    {
+      "id": "fig1",
+      "type": "class",
+      "title": "订单模块核心类图",
+      "chapter": "第5章 详细设计",
+      "source": "samples/springboot/classes.java",
+      "status": "todo"
+    }
+  ]
+}

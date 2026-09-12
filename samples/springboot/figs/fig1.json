@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "source": "samples/springboot/classes.java",
+  "title": "订单模块核心类图",
+  "classes": [
+    {
+      "name": "BaseEntity",
+      "label": "基础实体",
+      "stereotype": "abstract",
+      "attributes": ["# id", "# createdAt"],
+      "methods": []
+    },
+    {
+      "name": "Order",
+      "label": "订单",
+      "attributes": ["- orderNo", "- status", "- items"],
+      "methods": ["+ addItem(item)", "+ total()", "+ cancel()"]
+    },
+    {
+      "name": "OrderItem",
+      "label": "订单明细",
+      "attributes": ["- sku", "- qty", "- unitPrice"],
+      "methods": ["+ subtotal()"]
+    },
+    {
+      "name": "OrderStatus",
+      "label": "订单状态",
+      "stereotype": "enum",
+      "attributes": ["CREATED", "PAID", "CANCELLED"],
+      "methods": []
+    },
+    {
+      "name": "PaymentService",
+      "label": "支付服务",
+      "stereotype": "interface",
+      "attributes": [],
+      "methods": ["+ pay(order)", "+ refund(order)"]
+    },
+    {
+      "name": "OrderRepository",
+      "label": "订单仓库",
+      "stereotype": "interface",
+      "attributes": [],
+      "methods": ["+ save(order)", "+ findById(id)"]
+    },
+    {
+      "name": "OrderService",
+      "label": "订单服务",
+      "attributes": ["- payment", "- repo"],
+      "methods": ["+ create(cmd)", "+ cancel(id)"]
+    }
+  ],
+  "relations": [
+    { "from": "Order", "to": "BaseEntity", "kind": "继承" },
+    { "from": "OrderItem", "to": "BaseEntity", "kind": "继承" },
+    { "from": "Order", "to": "OrderItem", "kind": "组合", "label": "包含", "cardinality": "1:N" },
+    { "from": "Order", "to": "OrderStatus", "kind": "关联", "cardinality": "N:1" },
+    { "from": "OrderService", "to": "PaymentService", "kind": "关联" },
+    { "from": "OrderService", "to": "OrderRepository", "kind": "关联" }
+  ]
+}

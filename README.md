@@ -49,8 +49,11 @@ python3 build.py <plan.json> # 3. 逐图:校验 → 渲染 → 验收
 ```bash
 .venv/bin/python doctor.py
 .venv/bin/python plan.py  samples/library/plan.json
-.venv/bin/python build.py samples/library/plan.json    # 期望:4/4 通过 —— RESULT: PASS
+.venv/bin/python build.py samples/library/plan.json      # 期望:4/4 通过 —— RESULT: PASS
+.venv/bin/python build.py samples/springboot/plan.json   # 期望:1/1 通过(Java 可见性记号)
 ```
+
+`library` 是 Python 样例(不标可见性),`springboot` 是 Java 样例(标可见性)—— 照抄格式时按你项目的语言取其一。
 
 ## 5. 完整流程(对一份真实论文)
 
@@ -95,6 +98,34 @@ python3 build.py <plan.json> # 3. 逐图:校验 → 渲染 → 验收
 实测(毕设 14 个实体,最多的 10 个属性):出图 302~376pt 见方,**14/14 都 100% 适配
 A4 版心**,不必缩放,可以两张并排插。
 
+### 类图(UML 2.5 可见性)
+
+成员可以带**可见性记号**,写在成员串最前面,格式固定为 `记号 + 一个空格 + 成员`:
+
+| 记号 | 含义 |
+|---|---|
+| `+` | 公开 public |
+| `-` | 私有 private |
+| `#` | 保护 protected |
+| `~` | 包内 package |
+
+**标不标由源码语言决定,不由好看决定** —— 分界线是「可见性是不是编译器强制的」:
+
+| 语言 | 标? | 为什么 |
+|---|---|---|
+| Java / C# / TypeScript / C++ | **必须标** | 可见性由编译器强制,源码里查得到,不标就是漏信息 |
+| Rust / Go | **必须标** | `pub`、首字母大写同样是**强制**的可见性,不是约定 |
+| Python | **不标** | `_x` / `__x` 只是 PEP 8 命名约定、不强制,标成 `#` / `-` 是**假精度** |
+
+一个类里**要么都标、要么都不标**;枚举常量、接口方法按 UML 惯例可整类不标。
+
+渲染时记号排成左列对齐;**整类都不标就不加记号列** —— 所以 Python 类出的图与加此功能前完全一样。
+
+> **别给记号单开一列。** HTML 表格会把外层单元格的富余宽度分给窄列:表头比成员宽多少,
+> 记号列就胖多少。实测同一张图里间距从 14pt 到 55pt 不等(属性和方法是两张表,各自被
+> 撑开的程度不同),`fixedsize` 也压不住。故记号是**拼进成员串**的,整行一个文本对象。
+> 代价:`-` 比 `+` 窄约 3pt,名字会有几 pt 抖动 —— 换来的是列宽不随表头变形。
+
 ### 版面尺寸门禁
 
 验收会量 SVG 画布尺寸。按 A4 版心(约 470×700pt)需缩到 **70% 以下**时给出
@@ -109,7 +140,7 @@ A4 版心**,不必缩放,可以两张并排插。
 | `contract/plan.schema.json` | 出图清单 | `source` 必须具体到文件/章节,禁止"全文" |
 | `contract/er.schema.json` | ER 图 | `fields` 只放非外键列;外键进 `relation.fk_field`;`from` 是"一"侧 |
 | `contract/attr.schema.json` | 实体属性图 | **一张图一个实体**;`attributes` 里有且只有一个 `kind: "pk"` |
-| `contract/class.schema.json` | 类图 | 成员只写名称/签名;省略 getter/setter 样板;类数 ≤ 15 |
+| `contract/class.schema.json` | 类图 | 成员只写名称/签名;可带可见性记号 `"+ name"`(记号后**必须**有空格);类数 ≤ 15 |
 | `contract/flow.schema.json` | 流程图 | 单 `start` 单 `end`;`decision` 每条出边必须带 `label` |
 
 ## 7. 命令手册
@@ -131,6 +162,7 @@ A4 版心**,不必缩放,可以两张并排插。
 | 验收 FAIL「数据未在渲染后被改动」 | 改了 `figs/<id>.json` 但没重跑 → 重跑 `build.py` |
 | `[WARN] 版面 … 需缩到 xx%` | 图太宽/太高插不进 A4。ER 优先用紧凑版;仍超就按模块拆图 |
 | 流程图/ER 形状与标准不符 | 形状定义在 `engine/render_*.py` 顶部字典;改前先查规范(Chen vs Crow's Foot / GB/T 1526) |
+| 类图成员没显示可见性记号 | 成员串写成 `"-name"` 了(记号后必须有**一个空格**);或源码是 Python —— 那是**故意不标**的 |
 | 图太挤/太长 | 调 `engine/render_*.py` 顶部的布局常量(`rankdir`、间距),**不要动数据** |
 | 实体/类/步骤太多(dot 布局崩) | 精简:只画核心对象,把省略项写进给人类的"待确认" |
 
