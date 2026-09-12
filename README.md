@@ -178,6 +178,15 @@ WARN 文案会直接告诉你去看 `<id>_mod_*` 那几张的数 —— 那几�
 | `contract/class.schema.json` | 类图 | 成员只写名称/签名;可带可见性记号 `"+ name"`(记号后**必须**有空格);类数 ≤ 15 |
 | `contract/flow.schema.json` | 流程图 | 单 `start` 单 `end`;`decision` 每条出边必须带 `label` |
 
+> **契约表达不了的几件事** —— 遇到就**列进"待确认"**,不要硬凑一个形状上去:
+>
+> | 事 | 为什么 |
+> |---|---|
+> | **可空外键**(`null=True`) | `cardinality` 只有 `1:N / N:1 / 1:1 / N:M`,表达不了 `0..1` |
+> | **唯一约束**(`UniqueConstraint` / `unique_together`) | ER 图上没有位置表达"这两列合起来唯一" |
+> | **多态 / 松散引用**(字段存"某表 ID"、但源码里没有 `ForeignKey`) | 画不出连线 |
+> | **表的物理细节**(字段类型、`FileField` 与 `CharField` 之别) | 图的抽象层级不表达这些 |
+
 ## 7. 命令手册
 
 | 命令 | 作用 | 退出码 |
