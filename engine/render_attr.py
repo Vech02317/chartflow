@@ -8,7 +8,7 @@
 这是本仓库唯一「自带布局」的渲染器:dot/twopi 都做不出「按椭圆宽度分配角度」的星形
 (等角摆放时,中文属性名一宽就互相压住)。故用 neato -n(只画不排)、坐标自己算。两遍法:
     pass1  让 Graphviz 实算每个椭圆的宽高 —— 免去自己猜中文字宽;
-    pass2  按宽度做角度跨度分配,并在 0~180° 里挑一个让画布最窄的起始角,再渲染。
+    pass2  按宽度做角度跨度分配,并在 0~180° 里挑一个让画布最方正的起始角,再渲染。
 
 注意 base_graph(fixed_pos=True) 不能设 overlap —— 实测 neato 在 -n 下会因为
 overlap=false 去缩放整个布局,把这里算好的半径和角度全部打乱。
@@ -107,8 +107,11 @@ def _layout(data, sizes):
     for deg in range(0, 180, ROT_STEP):        # 转 180° 结果一样,扫半个圆就够
         d = math.radians(deg)
         w, h = _bbox(angs, radius, halfs, ent_half, d)
-        if best is None or (w, h) < best[0]:   # 先压宽度,再压高度
-            best = ((w, h), d)
+        # 目标:先压**最长边**、再压宽度。不能只压宽度 —— 只有两个属性时竖着排最窄,
+        # 只压宽度会选中一根 60×336pt 的竖条,插进论文里根本没法看。
+        key = (max(w, h), w)
+        if best is None or key < best[0]:
+            best = (key, d)
     delta = best[1]
     return [(radius * math.cos(a + delta), radius * math.sin(a + delta))
             for a in angs]
