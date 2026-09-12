@@ -13,6 +13,9 @@ import graphviz
 FONT = "Noto Sans CJK SC"
 ACCENT = "#2ea27f"
 EDGE = "#7a7a7a"
+# 引用框(ER 模块图里表示“别的模块的实体”):比连线 EDGE 更浅,让它退到背景里
+REF_EDGE = "#9a9a9a"
+REF_TEXT = "#6f6f6f"
 
 # 每类图“数什么”:验收据此比对契约与产物
 COUNT_FIELDS = {
@@ -26,6 +29,7 @@ COUNT_FIELDS = {
 VARIANT_DOC = {
     "full": "详细版 —— 含全部字段,供作者自查",
     "compact": "紧凑版 —— 只画实体名与关系,供插入论文",
+    "mod_*": "模块图 —— 本模块实体 + 其他模块的虚线引用框,实体多时替代紧凑版插论文",
 }
 
 
@@ -62,8 +66,13 @@ def emit_many(graphs, fig_id, type_, data_path, data, out_dir,
               render_kw=None) -> dict:
     """渲染多种版式并写一份 meta。
 
-    graphs: [(suffix, graphviz_graph), ...];suffix 为空表示主版式。
+    graphs: [(suffix, graphviz_graph[, info]), ...];suffix 为空表示主版式。
     例:ER 传 [("", 详细图), ("_compact", 紧凑图)] → fig1.png + fig1_compact.png
+
+    第三元素 info 可选,是渲染器对该变体的**自述**(如 ER 模块图的
+    {"module": …, "internal": […], "relation_ids": […]}),会原样并进 meta 的
+    outputs 记录里 —— 验收器据此核对「实体没漏、关系没丢」。
+    只传 2 元组时行为与从前完全一致。
 
     render_kw 透传给 graphviz 的 render();自带布局的图型(attr)要传
     {"neato_no_op": 1} 才是「只画不排」。
@@ -71,14 +80,16 @@ def emit_many(graphs, fig_id, type_, data_path, data, out_dir,
     out = pathlib.Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     outputs = []
-    for suffix, g in graphs:
+    for item in graphs:
+        suffix, g = item[0], item[1]
+        info = item[2] if len(item) > 2 else {}
         stem = f"{fig_id}{suffix}"
         for fmt in ("svg", "png"):
             g.format = fmt
             g.render(filename=stem, directory=str(out), cleanup=False,
                      **(render_kw or {}))
         outputs.append({"variant": (suffix or "full").lstrip("_"),
-                        "svg": f"{stem}.svg", "png": f"{stem}.png"})
+                        "svg": f"{stem}.svg", "png": f"{stem}.png", **info})
 
     meta = {
         "fig_id": fig_id,

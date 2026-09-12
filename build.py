@@ -19,7 +19,7 @@ RENDERERS = {"er": "render_er", "class": "render_class", "flow": "render_flow",
 
 
 def main(plan_path) -> bool:
-    from jsonschema import validate
+    from jsonschema import ValidationError, validate
     plan_path = pathlib.Path(plan_path).resolve()
     base = plan_path.parent
     figs_dir, out_dir = base / "figs", base / "out"
@@ -41,8 +41,15 @@ def main(plan_path) -> bool:
 
         contract = ROOT / "contract" / f"{ftype}.schema.json"
         data = json.loads(fig_json.read_text(encoding="utf-8"))
-        validate(instance=data,
-                 schema=json.loads(contract.read_text(encoding="utf-8")))
+        try:
+            validate(instance=data,
+                     schema=json.loads(contract.read_text(encoding="utf-8")))
+        except ValidationError as e:
+            # 契约错误要给人话,不是 traceback —— 报错路径直接落到出问题的那个键
+            where = "/".join(str(p) for p in e.absolute_path) or "(根)"
+            print(f"[{fid}] FAIL —— 不符契约 {where}:{e.message}")
+            results.append(False)
+            continue
 
         module = importlib.import_module(f"engine.{RENDERERS[ftype]}")
         module.render(fig_json, fid, out_dir)

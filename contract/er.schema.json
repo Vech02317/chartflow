@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "er.schema.json",
   "title": "ER 图数据契约 v1",
-  "description": "LLM(或人工)从 Django models/建表语句抽取出的实体关系,渲染器与验收器唯一输入。字段约定:entity.fields 只放非外键列;外键以 relation.fk_field 表示;relation 的 from 是“一”侧、to 是“多”侧,cardinality 写作 1:N。",
+  "description": "LLM(或人工)从 Django models/建表语句抽取出的实体关系,渲染器与验收器唯一输入。字段约定:entity.fields 只放非外键列;外键以 relation.fk_field 表示;relation 的 from 是“一”侧、to 是“多”侧,cardinality 写作 1:N。实体多时可在实体上标 module、顶层写 modules —— 渲染器据此额外产出按模块拆的图(见 README「ER 模块图」)。",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "source", "title", "entities", "relations"],
@@ -10,6 +10,25 @@
     "version": { "const": 1 },
     "source": { "type": "string", "description": "抽取来源文件(如 samples/library/models.py)" },
     "title": { "type": "string" },
+    "modules": {
+      "type": "array",
+      "minItems": 2,
+      "description": "模块划分。写了它,渲染器会自动多产出 <id>_mod_<name>.svg 系列模块图;不写则只出详细/紧凑两版。只有一个模块不算拆分,故 minItems=2。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "label", "title"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "模块标识,会进文件名(fig1_mod_<name>.svg)。优先取源码的 app/包名 —— 可对着源码核。"
+          },
+          "label": { "type": "string", "description": "论文里的中文模块名,如“书籍模块”" },
+          "title": { "type": "string", "description": "该模块图的图题(要印在图上),如“书籍模块 E-R 图”。由抽取者明确写出,渲染器不拼。原文案不得编造。" }
+        }
+      }
+    },
     "entities": {
       "type": "array",
       "minItems": 1,
@@ -21,6 +40,11 @@
           "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
           "label": { "type": "string" },
           "table": { "type": "string" },
+          "module": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "所属模块的 name,须在顶层 modules 里声明。只在本图要出模块图时写;不写则整个实体集不拆。"
+          },
           "fields": {
             "type": "array",
             "minItems": 1,
@@ -54,5 +78,18 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["modules"] },
+      "then": { "properties": { "entities": { "items": { "required": ["module"] } } } }
+    },
+    {
+      "if": {
+        "required": ["entities"],
+        "properties": { "entities": { "contains": { "required": ["module"] } } }
+      },
+      "then": { "required": ["modules"] }
+    }
+  ]
 }

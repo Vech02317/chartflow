@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "paper": "校园活动报名系统(ER 模块图样例)",
+  "figures": [
+    {
+      "id": "fig1",
+      "type": "er",
+      "title": "校园活动报名系统——整体 E-R 图",
+      "chapter": "第4章 系统设计 / 4.4 数据库设计",
+      "source": "samples/campus/accounts_models.py, activity_models.py, venue_models.py",
+      "status": "todo",
+      "note": "13 实体 / 20 关系,实体较多,预计需按模块拆图;建议按源码 app 分 accounts / activity / venue 三个模块"
+    }
+  ]
+}

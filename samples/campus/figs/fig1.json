@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "source": "samples/campus/{accounts,activity,venue}_models.py",
+  "title": "校园活动报名系统——整体 E-R 图",
+  "modules": [
+    { "name": "accounts", "label": "账户模块", "title": "账户模块 E-R 图" },
+    { "name": "activity", "label": "活动模块", "title": "活动模块 E-R 图" },
+    { "name": "venue",    "label": "场地模块", "title": "场地模块 E-R 图" }
+  ],
+  "entities": [
+    {
+      "name": "User", "label": "用户", "table": "accounts_user", "module": "accounts",
+      "fields": [
+        { "name": "id", "label": "用户ID", "pk": true },
+        { "name": "username", "label": "用户名" },
+        { "name": "password", "label": "密码" },
+        { "name": "email", "label": "邮箱" },
+        { "name": "nickname", "label": "昵称" },
+        { "name": "avatar", "label": "头像" },
+        { "name": "student_no", "label": "学号" },
+        { "name": "college", "label": "学院" },
+        { "name": "credit", "label": "信用分" },
+        { "name": "is_banned", "label": "是否封禁" }
+      ]
+    },
+    {
+      "name": "Notification", "label": "站内通知", "table": "accounts_notification", "module": "accounts",
+      "fields": [
+        { "name": "id", "label": "通知ID", "pk": true },
+        { "name": "title", "label": "标题" },
+        { "name": "content", "label": "内容" },
+        { "name": "is_read", "label": "是否已读" },
+        { "name": "created_at", "label": "发送时间" }
+      ]
+    },
+    {
+      "name": "LoginLog", "label": "登录日志", "table": "accounts_loginlog", "module": "accounts",
+      "fields": [
+        { "name": "id", "label": "日志ID", "pk": true },
+        { "name": "ip", "label": "登录IP" },
+        { "name": "device", "label": "设备" },
+        { "name": "created_at", "label": "登录时间" }
+      ]
+    },
+    {
+      "name": "ActivityCategory", "label": "活动分类", "table": "activity_activitycategory", "module": "activity",
+      "fields": [
+        { "name": "id", "label": "分类ID", "pk": true },
+        { "name": "name", "label": "分类名" },
+        { "name": "created_at", "label": "创建时间" }
+      ]
+    },
+    {
+      "name": "Activity", "label": "活动", "table": "activity_activity", "module": "activity",
+      "fields": [
+        { "name": "id", "label": "活动ID", "pk": true },
+        { "name": "title", "label": "活动名称" },
+        { "name": "description", "label": "活动简介" },
+        { "name": "start_at", "label": "开始时间" },
+        { "name": "end_at", "label": "结束时间" },
+        { "name": "capacity", "label": "名额上限" },
+        { "name": "status", "label": "状态" },
+        { "name": "cover", "label": "封面图" },
+        { "name": "created_at", "label": "创建时间" }
+      ]
+    },
+    {
+      "name": "Enrollment", "label": "报名记录", "table": "activity_enrollment", "module": "activity",
+      "fields": [
+        { "name": "id", "label": "报名ID", "pk": true },
+        { "name": "status", "label": "报名状态" },
+        { "name": "attended", "label": "是否签到" },
+        { "name": "created_at", "label": "报名时间" }
+      ]
+    },
+    {
+      "name": "ActivityReview", "label": "活动评价", "table": "activity_activityreview", "module": "activity",
+      "fields": [
+        { "name": "id", "label": "评价ID", "pk": true },
+        { "name": "score", "label": "评分" },
+        { "name": "comment", "label": "评价内容" },
+        { "name": "created_at", "label": "评价时间" }
+      ]
+    },
+    {
+      "name": "ActivityTag", "label": "活动标签", "table": "activity_activitytag", "module": "activity",
+      "fields": [
+        { "name": "id", "label": "标签ID", "pk": true },
+        { "name": "name", "label": "标签名" }
+      ]
+    },
+    {
+      "name": "Venue", "label": "场地", "table": "venue_venue", "module": "venue",
+      "fields": [
+        { "name": "id", "label": "场地ID", "pk": true },
+        { "name": "name", "label": "场地名称" },
+        { "name": "location", "label": "位置" },
+        { "name": "capacity", "label": "容纳人数" },
+        { "name": "is_open", "label": "是否开放" },
+        { "name": "created_at", "label": "创建时间" }
+      ]
+    },
+    {
+      "name": "VenueSlot", "label": "场地时段", "table": "venue_venueslot", "module": "venue",
+      "fields": [
+        { "name": "id", "label": "时段ID", "pk": true },
+        { "name": "start_at", "label": "开始时间" },
+        { "name": "end_at", "label": "结束时间" },
+        { "name": "is_booked", "label": "是否已约" }
+      ]
+    },
+    {
+      "name": "VenueBooking", "label": "场地预约", "table": "venue_venuebooking", "module": "venue",
+      "fields": [
+        { "name": "id", "label": "预约ID", "pk": true },
+        { "name": "purpose", "label": "用途" },
+        { "name": "status", "label": "预约状态" },
+        { "name": "created_at", "label": "预约时间" }
+      ]
+    },
+    {
+      "name": "VenueReview", "label": "场地评价", "table": "venue_venuereview", "module": "venue",
+      "fields": [
+        { "name": "id", "label": "评价ID", "pk": true },
+        { "name": "score", "label": "评分" },
+        { "name": "comment", "label": "评价内容" },
+        { "name": "created_at", "label": "评价时间" }
+      ]
+    },
+    {
+      "name": "VenueEquipment", "label": "场地设备", "table": "venue_venueequipment", "module": "venue",
+      "fields": [
+        { "name": "id", "label": "设备ID", "pk": true },
+        { "name": "name", "label": "设备名" },
+        { "name": "quantity", "label": "数量" }
+      ]
+    }
+  ],
+  "relations": [
+    { "from": "User", "to": "Notification", "cardinality": "1:N", "label": "接收", "fk_field": "user_id" },
+    { "from": "User", "to": "LoginLog", "cardinality": "1:N", "label": "登录", "fk_field": "user_id" },
+    { "from": "User", "to": "ActivityCategory", "cardinality": "1:N", "label": "创建", "fk_field": "user_id" },
+    { "from": "User", "to": "Activity", "cardinality": "1:N", "label": "发起", "fk_field": "creator_id" },
+    { "from": "User", "to": "Enrollment", "cardinality": "1:N", "label": "报名", "fk_field": "user_id" },
+    { "from": "User", "to": "ActivityReview", "cardinality": "1:N", "label": "撰写", "fk_field": "user_id" },
+    { "from": "User", "to": "ActivityTag", "cardinality": "1:N", "label": "创建", "fk_field": "user_id" },
+    { "from": "ActivityCategory", "to": "Activity", "cardinality": "1:N", "label": "归类", "fk_field": "category_id" },
+    { "from": "Activity", "to": "Enrollment", "cardinality": "1:N", "label": "含", "fk_field": "activity_id" },
+    { "from": "Activity", "to": "ActivityReview", "cardinality": "1:N", "label": "收到", "fk_field": "activity_id" },
+    { "from": "Activity", "to": "ActivityTag", "cardinality": "N:M", "label": "使用", "fk_field": "activities" },
+    { "from": "VenueSlot", "to": "Enrollment", "cardinality": "1:N", "label": "安排", "fk_field": "venue_slot_id" },
+    { "from": "User", "to": "Venue", "cardinality": "1:N", "label": "申请", "fk_field": "applicant_id" },
+    { "from": "User", "to": "VenueBooking", "cardinality": "1:N", "label": "预约", "fk_field": "user_id" },
+    { "from": "User", "to": "VenueReview", "cardinality": "1:N", "label": "评价", "fk_field": "user_id" },
+    { "from": "Activity", "to": "VenueEquipment", "cardinality": "1:N", "label": "配备", "fk_field": "activity_id" },
+    { "from": "Venue", "to": "VenueSlot", "cardinality": "1:N", "label": "划分", "fk_field": "venue_id" },
+    { "from": "Venue", "to": "VenueReview", "cardinality": "1:N", "label": "收到", "fk_field": "venue_id" },
+    { "from": "Venue", "to": "VenueEquipment", "cardinality": "1:N", "label": "配置", "fk_field": "venue_id" },
+    { "from": "VenueSlot", "to": "VenueBooking", "cardinality": "1:N", "label": "被预约", "fk_field": "slot_id" }
+  ]
+}
