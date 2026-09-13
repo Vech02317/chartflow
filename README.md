@@ -26,6 +26,7 @@ prompts/    5 份抽取提示词 —— 你的工作说明书
 engine/     渲染器(er/attr/class/flow)+ 共用件 + 验收器
 doctor.py   环境自检        plan.py   校验《出图清单》
 build.py    逐图执行流水线    samples/  合成样例(可照抄格式)
+Dockerfile  容器镜像(把 dot 与中文字体钉死)   .github/  CI:样例回归 + 镜像构建
 使用说明.md  给人类的说明书(不用读)
 ```
 
@@ -56,6 +57,44 @@ python3 build.py <plan.json> # 3. 逐图:校验 → 渲染 → 验收
 
 `library` 是 Python 样例(不标可见性),`springboot` 是 Java 样例(标可见性)—— 照抄格式时按你项目的语言取其一。
 `campus` 是**实体多的 ER 样例**(13 实体 / 3 模块),照抄它的 `modules` 写法。
+
+自测的期望值也是 CI 的断言(`.github/workflows/ci.yml`)。**两处必须同时改** ——
+只改一处,不是 CI 红,就是文档撒谎。
+
+### 环境起不来?用容器(零配置)
+
+裸机上最常卡住的两样东西 —— Graphviz 的 `dot` 可执行文件、中文字体 ——
+镜像里已经钉死。命令形状与本文完全一致,只是前面加 `docker run`:
+
+```bash
+docker build -t chartflow .
+
+docker run --rm chartflow                                     # 默认跑 doctor.py
+docker run --rm chartflow build.py samples/library/plan.json  # 期望同样 4/4 通过
+```
+
+跑自己的论文数据,把工作目录挂进去:
+
+```bash
+docker run --rm -v "$PWD/我的论文:/data" chartflow build.py /data/plan.json
+```
+
+镜像里以 uid 1000 运行(与多数 Linux / WSL 用户一致),产物不会在宿主上变成 root 属主。
+宿主 uid 不是 1000 时(挂载目录写不进去就是撞上这个了),补一句:
+
+```bash
+docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/我的论文:/data" chartflow build.py /data/plan.json
+```
+
+需要进容器里看看(比如手敲命令排查),把 entrypoint 换掉:
+
+```bash
+docker run --rm -it --entrypoint bash chartflow
+```
+
+**镜像里为什么必须有中文字体**:缺了它,图上的汉字会渲染成一个个方框,
+而 `build.py` 照样 PASS —— 因为验收只看"图与契约一致",不看"字认不认得出来"。
+这是那三条铁律第二条("PASS ≠ 正确")在环境层面的又一次现身。
 
 ## 5. 完整流程(对一份真实论文)
 
@@ -209,6 +248,7 @@ WARN 文案会直接告诉你去看 `<id>_mod_*` 那几张的数 —— 那几�
 | `python3 plan.py <plan.json>` | 校验清单结构 + 语义(id 唯一、source 具体、skip 有原因) | 0=PASS |
 | `python3 build.py <plan.json>` | 逐图校验→渲染→验收,产物落 `out/` | 0=全通过 |
 | `python3 engine/check_figs.py <id> <type>` | 单独复验某张图 | 0=PASS |
+| `docker run --rm chartflow <同上命令>` | 同上,但环境由镜像保证 | 同上 |
 
 ## 8. 失败排查
 

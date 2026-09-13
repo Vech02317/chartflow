@@ -1,0 +1,9 @@
+# 构建上下文只留源码。Docker 的匹配规则不像 .gitignore 那样自动递归,
+# 所以嵌套路径一律显式写成 **/ 前缀。
+.git
+.github
+.venv
+**/__pycache__
+**/*.pyc
+**/out
+work
