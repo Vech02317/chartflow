@@ -1,10 +1,64 @@
 # chartflow —— 工科论文产图流水线(给 AI 的操作手册)
 
+[![CI](https://github.com/Vech02317/chartflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Vech02317/chartflow/actions/workflows/ci.yml)
+
 把论文与项目源码交给 agent,产出**可重跑、风格统一、自动验收**的 ER 图 / 实体属性图 / 类图 / 流程图。
 
 本文件是**程序的一部分**:任何 agent(codex / deepseek harness / Claude Code)按本文操作即可。
 
 ---
+
+## 它画出来长什么样
+
+以下全部是仓库自带的三个样例**跑出来的**,不是手工画的 —— 重跑 `build.py` 即可复现。
+
+### 四种图型
+
+**ER 图 · 详细版** —— 实体盒含全部字段,给作者自查「我到底建了什么」
+
+![ER 图 · 详细版](docs/library-er.png)
+
+**ER 图 · 紧凑版** —— 只画实体名与关系。实体少时插论文用它
+
+![ER 图 · 紧凑版](docs/library-er-compact.png)
+
+**类图** —— 源码是 Python,所以成员前**不带**可见性记号(故意的,不是漏了)
+
+![类图](docs/library-class.png)
+
+**流程图** —— 从正文描述抽,四种图型里模糊度最高的一种
+
+![流程图](docs/library-flow.png)
+
+**实体属性图** —— Chen 记法:主键带下划线、多值属性双椭圆;一张图只画一个实体
+
+![实体属性图](docs/library-attr.png)
+
+### 源码是 Java 时,类图标出可见性
+
+![Java 类图](docs/springboot-class.png)
+
+### 实体多到一张图塞不进论文时:自动按模块拆
+
+13 实体 / 21 关系的整体图,全字段展开 —— 这张要缩到 43% 才塞得进 A4 版心,字就没法看了:
+
+![campus 整体 ER 图](docs/campus-er.png)
+
+换紧凑版仍然不够(缩到 65% 还是偏宽):
+
+![campus 整体 ER 紧凑版](docs/campus-er-compact.png)
+
+所以按模块拆。每张只画本模块的实体,**别的模块画成虚线框** —— 只写实体名、不列字段,
+关系照画、一条不丢:
+
+| accounts | activity | venue |
+|---|---|---|
+| ![accounts](docs/campus-mod-accounts.png) | ![activity](docs/campus-mod-activity.png) | ![venue](docs/campus-mod-venue.png) |
+
+三张模块图都能**零缩放**插进论文。而且整体图与模块图出自**同一份数据** ——
+不是靠校验去发现两边漂移,是漂移在结构上不存在。
+
+> 详细规则见 §5「ER 模块图」。
 
 ## 1. 它是什么
 
